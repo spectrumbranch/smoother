@@ -19,7 +19,7 @@ n_frames = 1
 filt = moving_average_filter(n_frames, frame_shape)
 dumper = file_io('./data/dump.json')
 dump_frame_counter = 0
-dump_frames_max = 1
+dump_frames_max = 2
 has_dumped_yet = False
 dump_frames = [] # collections.deque(np.array([]))
 while True:
@@ -39,7 +39,7 @@ while True:
 
     if dump_frame_counter < dump_frames_max:
         dump_frame_counter += 1
-        dump_frames.append(subsection)
+        dump_frames.append(subsection.tolist())
 
     if not has_dumped_yet and dump_frame_counter == dump_frames_max:
         has_dumped_yet = True
