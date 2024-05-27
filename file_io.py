@@ -1,4 +1,5 @@
 import json
+from numpy_array_encoder import numpy_array_encoder
 
 class file_io():
 
@@ -7,7 +8,7 @@ class file_io():
 
     def write(self, data):
         with open(self.file_name, "w") as outfile:
-            outfile.write(json.dumps(data))
+            outfile.write(json.dumps(data, cls=numpy_array_encoder))
         print("Written object", data)
 
     def read(self):

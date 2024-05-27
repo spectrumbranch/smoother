@@ -2,6 +2,7 @@ import numpy as np
 import collections
 import cv2 as cv
 from moving_average_filter import moving_average_filter
+from delta_frames import delta_frames
 from file_io import file_io
 
 # FriendlyName: Game Capture HD60 Pro
@@ -15,13 +16,14 @@ if not cap.isOpened():
 print("getBackendName:" + cap.getBackendName())
 # frame_shape = (1080, 1920, 3)
 frame_shape = (1080, 1920)
+# subsection_frame_shape = (1080, 1920)
 n_frames = 1
 filt = moving_average_filter(n_frames, frame_shape)
 dumper = file_io('./data/dump.json')
 dump_frame_counter = 0
 dump_frames_max = 2
 has_dumped_yet = False
-dump_frames = [] # collections.deque(np.array([]))
+delta = delta_frames()
 while True:
     # Capture frame-by-frame
     ret, frame = cap.read()
@@ -39,33 +41,15 @@ while True:
 
     if dump_frame_counter < dump_frames_max:
         dump_frame_counter += 1
-        dump_frames.append(subsection.tolist())
+        delta.add_frame(subsection)
 
     if not has_dumped_yet and dump_frame_counter == dump_frames_max:
         has_dumped_yet = True
-#         dumper.write(subsection.tolist())
-        dumper.write(dump_frames)
-#         dumper.write(filt.average.tolist()) ####
-
-#     filt.add_sample(frame)
-
-#     cv.imshow("frame", filt.sum/len(filt.buffer))
-
-#     print(type(filt.average[0][0][0]))
-
-#     # vertical slices
-#     filt.average[:, 412] = 255
-#     filt.average[:, 1486] = 255
-#
-#     # horizontal slices
-#     filt.average[636, :] = 255
-#     filt.average[972, :] = 255
-
+        dumper.write(delta.dump_frames())
 
     # Display the resulting frame
     cv.imshow("frame", subsection) #########
 
-#     cv.imshow("frame", frame)
     if cv.waitKey(1) == ord("q"):
         break
 
