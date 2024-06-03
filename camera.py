@@ -23,7 +23,8 @@ dumper = file_io('./data/dump.json')
 dump_frame_counter = 0
 dump_frames_max = 2
 has_dumped_yet = False
-delta = delta_frames()
+delta_frame_shape = (1080, 1920)
+delta = delta_frames(delta_frame_shape)
 while True:
     # Capture frame-by-frame
     ret, frame = cap.read()
@@ -39,16 +40,19 @@ while True:
 
     subsection = filt.average[636:972 , 412:1486]
 
-    if dump_frame_counter < dump_frames_max:
-        dump_frame_counter += 1
-        delta.add_frame(subsection)
+#     if dump_frame_counter < dump_frames_max:
+#         dump_frame_counter += 1
+    delta.add_frame(subsection)
+    delta.update_delta()
 
-    if not has_dumped_yet and dump_frame_counter == dump_frames_max:
-        has_dumped_yet = True
-        dumper.write(delta.dump_frames())
+#     if not has_dumped_yet and dump_frame_counter == dump_frames_max:
+#         has_dumped_yet = True
+#         dumper.write(delta.dump_frames())
 
     # Display the resulting frame
     cv.imshow("frame", subsection) #########
+
+    cv.imshow("delta", delta.delta) #########
 
     if cv.waitKey(1) == ord("q"):
         break
